@@ -1,5 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+from collections import deque
 
 # Create the directed graph
 G = nx.DiGraph()
@@ -96,8 +97,104 @@ nx.draw(
 edge_labels = {(u, v): f"{d['weight']}" for u, v, d in G.edges(data=True)}
 nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=10)
 
+
+capacity_matrix = [
+    [0, 0, 25, 20, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # 0 Terminal 1
+    [0, 0, 0, 10, 15, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # 1 Terminal 2
+    [0, 0, 0, 0, 0, 0, 15, 10, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # 2 Warehouse 1
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 10, 25, 0, 0, 0, 0, 0, 0, 0, 0],  # 3 Warehouse 2
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 15, 10, 0, 0, 0, 0, 0],  # 4 Warehouse 3
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 10, 15, 5, 10],  # 5 Warehouse 4
+    [0] * 20,  # 6 Shop 1
+    [0] * 20,  # 7 Shop 2
+    [0] * 20,  # 8 Shop 3
+    [0] * 20,  # 9 Shop 4
+    [0] * 20,  # 10 Shop 5
+    [0] * 20,  # 11 Shop 6
+    [0] * 20,  # 12 Shop 7
+    [0] * 20,  # 13 Shop 8
+    [0] * 20,  # 14 Shop 9
+    [0] * 20,  # 15 Shop 10
+    [0] * 20,  # 16 Shop 11
+    [0] * 20,  # 17 Shop 12
+    [0] * 20,  # 18 Shop 13
+    [0] * 20,  # 19 Shop 14
+]
+
+
+def bfs(capacity_matrix, flow_matrix, source, sink, parent):
+    visited = [False] * len(capacity_matrix)
+    queue = deque([source])
+    visited[source] = True
+
+    while queue:
+        current_node = queue.popleft()
+
+        for neighbor in range(len(capacity_matrix)):
+            if (
+                not visited[neighbor]
+                and capacity_matrix[current_node][neighbor]
+                - flow_matrix[current_node][neighbor]
+                > 0
+            ):
+                parent[neighbor] = current_node
+                visited[neighbor] = True
+                if neighbor == sink:
+                    return True
+                queue.append(neighbor)
+
+    return False
+
+
+def edmonds_karp(capacity_matrix, source, sink):
+    num_nodes = len(capacity_matrix)
+    flow_matrix = [[0] * num_nodes for _ in range(num_nodes)]
+    parent = [-1] * num_nodes
+    max_flow = 0
+
+    while bfs(capacity_matrix, flow_matrix, source, sink, parent):
+        path_flow = float("Inf")
+        current_node = sink
+
+        while current_node != source:
+            previous_node = parent[current_node]
+            path_flow = min(
+                path_flow,
+                capacity_matrix[previous_node][current_node]
+                - flow_matrix[previous_node][current_node],
+            )
+            current_node = previous_node
+
+        current_node = sink
+        while current_node != source:
+            previous_node = parent[current_node]
+            flow_matrix[previous_node][current_node] += path_flow
+            flow_matrix[current_node][previous_node] -= path_flow
+            current_node = previous_node
+
+        max_flow += path_flow
+
+    return max_flow
+
+
+def print_max_flow_table(capacity_matrix, labels_nodes):
+    print(f"{'Store':<10}|", end="")
+    for source in range(2):
+        print(f"{labels_nodes[source]:^12}|", end="")
+    print()
+
+    print("-" * (11 + 2 * 13))
+
+    for sink in range(6, 20):
+        print(f"{labels_nodes[sink]:<10}|", end="")
+        for source in range(2):
+            max_flow = edmonds_karp(capacity_matrix, source, sink)
+            print(f"{str(max_flow):^12}|", end="")
+        print()
+
+
 if __name__ == "__main__":
     plt.title("Directed Graph with Flow Capacities", fontsize=14)
     plt.axis("off")
-    plt.tight_layout()
     plt.show()
+    print_max_flow_table(capacity_matrix, labels_nodes)
