@@ -61,3 +61,15 @@ Yes, there are bottlenecks that can be removed to improve the efficiency of the 
 - Modernization or expansion of infrastructure in these areas will increase their capacity.
 
 - It is also possible to reconsider the distribution of flows: sometimes redirecting through alternative routes (if possible in the logistics scheme) can provide more flows without significant investments in modernization.
+
+---
+
+# Task 2. Comparing the effectiveness of OOBTree and a dictionary for range queries
+
+## OOBTree
+
+Total range_query time for *OOBTree*: **0.093383** seconds
+
+## Dict
+
+Total range_query time for *Dict*: **6.736072** seconds
