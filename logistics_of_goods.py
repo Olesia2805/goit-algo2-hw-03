@@ -178,15 +178,15 @@ def edmonds_karp(capacity_matrix, source, sink):
 
 
 def print_max_flow_table(capacity_matrix, labels_nodes):
-    print(f"{'Store':<10}|", end="")
+    print(f"|{'Store':<10}|", end="")
     for source in range(2):
         print(f"{labels_nodes[source]:^12}|", end="")
     print()
 
-    print("-" * (11 + 2 * 13))
+    print("|----------|:----------:|:----------:|")
 
     for sink in range(6, 20):
-        print(f"{labels_nodes[sink]:<10}|", end="")
+        print(f"|{labels_nodes[sink]:<10}|", end="")
         for source in range(2):
             max_flow = edmonds_karp(capacity_matrix, source, sink)
             print(f"{str(max_flow):^12}|", end="")
