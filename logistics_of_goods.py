@@ -194,7 +194,7 @@ def print_max_flow_table(capacity_matrix, labels_nodes):
 
 
 if __name__ == "__main__":
+    print_max_flow_table(capacity_matrix, labels_nodes)
     plt.title("Directed Graph with Flow Capacities", fontsize=14)
     plt.axis("off")
     plt.show()
-    print_max_flow_table(capacity_matrix, labels_nodes)
